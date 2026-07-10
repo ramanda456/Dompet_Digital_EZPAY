@@ -1,0 +1,35 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ZIP file
+aplikasi_ezpay_1.zip
+
+# Flutter build
+aplikasi_ezpay_1/build/
+aplikasi_ezpay_1/.dart_tool/
+aplikasi_ezpay_1/.flutter-plugins-dependencies
+
+# Laravel vendor & env
+ezpay-backend/vendor/
+ezpay-backend/node_modules/
+ezpay-backend/.env
+ezpay-backend/.env.backup
+ezpay-backend/.env.production
+ezpay-backend/.phpunit.result.cache
+ezpay-backend/.phpunit.cache/
+ezpay-backend/public/build/
+ezpay-backend/public/hot
+ezpay-backend/public/storage
+ezpay-backend/storage/*.key
+ezpay-backend/storage/pail/
+
+# Firebase credentials (sensitive)
+ezpay-backend/storage/app/firebase-credentials.json

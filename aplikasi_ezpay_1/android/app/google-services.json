@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "109147863197",
+    "project_id": "dompetdigital-5c8b8",
+    "storage_bucket": "dompetdigital-5c8b8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:109147863197:android:7d6d13f65601d4ccebbc74",
+        "android_client_info": {
+          "package_name": "com.example.aplikasi_ezpay_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "109147863197-8rqg4qjd2cne7b73u7rj4gpk1uaqiru9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.aplikasi_ezpay_1",
+            "certificate_hash": "347887d3a4e428cc1a3f9537efbb3a591a9b1280"
+          }
+        },
+        {
+          "client_id": "109147863197-opu5l8mrqbqrp7o8o665569pvsbqc9e2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDjrMXxDUirOTapHKjCZuQR68J-RZfRqU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "109147863197-opu5l8mrqbqrp7o8o665569pvsbqc9e2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
