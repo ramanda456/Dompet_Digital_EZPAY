@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import '../../../home_screen.dart';
+import '../../../../services/user_firestore_service.dart'; // formatSaldoIdr
 
 class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
-  const TarikTunaiLewatMerchantIndomaretPage4({super.key});
+  final double amount;
+  final String withdrawalCode;
+  final String transactionCode;
+  final double adminFee;
+
+  const TarikTunaiLewatMerchantIndomaretPage4({
+    super.key,
+    required this.amount,
+    required this.withdrawalCode,
+    required this.transactionCode,
+    required this.adminFee,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final double total = amount + adminFee;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: Container(
@@ -27,7 +41,10 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        (route) => false,
+                      ),
                     ),
                     const Text(
                       "Indomaret",
@@ -35,6 +52,7 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -58,6 +76,7 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                     ],
@@ -110,16 +129,18 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
+                                  fontFamily: 'Poppins',
                                 ),
                               ),
                             ),
                             const SizedBox(height: 10),
-                            const Text(
-                              "123456",
-                              style: TextStyle(
+                            Text(
+                              withdrawalCode,
+                              style: const TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 2,
+                                fontFamily: 'Poppins',
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -128,57 +149,18 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.black87,
+                                fontFamily: 'Poppins',
                               ),
                             ),
                             const SizedBox(height: 18),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Text(
-                                  "Nominal Tarik Tunai",
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                                Text(
-                                  "Rp 100.000",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Text(
-                                  "Tarik Tunai Melalui",
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                                Text(
-                                  "INDOMARET",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _buildDetailRow("ID Transaksi", transactionCode),
+                            _buildDetailRow("Nominal Tarik Tunai", formatSaldoIdr(amount.toInt())),
+                            _buildDetailRow("Tarik Tunai Melalui", "INDOMARET"),
+                            _buildDetailRow("Biaya Admin", formatSaldoIdr(adminFee.toInt())),
+                            const Divider(),
+                            _buildDetailRow("Total Terpotong", formatSaldoIdr(total.toInt()), bold: true),
                           ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFDDEFFF),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: const Text(
-                          "Biaya Admin : Rp 1.000",
-                          style: TextStyle(fontSize: 13),
                         ),
                       ),
                     ],
@@ -193,6 +175,7 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
+                    fontFamily: 'Poppins',
                   ),
                 ),
                 const Divider(thickness: 1, color: Colors.black),
@@ -201,7 +184,7 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                   "1. Tunjukkan Kode Token ke kasir sebelum kadaluarsa\n"
                   "2. Beri tahu kasir nominal tarik tunai, kode token, dan no. HP yang terdaftar di akun EZ Pay\n"
                   "3. Setelah transaksi berhasil, kasir akan memberikan uang tunai dan saldo EZ Pay-mu akan terpotong",
-                  style: TextStyle(fontSize: 13, height: 1.6),
+                  style: TextStyle(fontSize: 13, height: 1.6, fontFamily: 'Poppins'),
                 ),
 
                 const SizedBox(height: 40),
@@ -217,13 +200,10 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
-                        ),
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        (route) => false,
                       );
-
                     },
                     child: const Text(
                       "KEMBALI KE BERANDA",
@@ -231,6 +211,7 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.2,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ),
@@ -240,6 +221,34 @@ class TarikTunaiLewatMerchantIndomaretPage4 extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, {bool bold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 12,
+              color: Colors.grey.shade700,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
+              fontSize: 12,
+              color: Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }

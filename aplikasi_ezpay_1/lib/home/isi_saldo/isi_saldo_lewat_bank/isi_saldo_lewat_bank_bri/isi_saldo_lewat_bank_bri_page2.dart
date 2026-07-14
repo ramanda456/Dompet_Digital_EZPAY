@@ -1,8 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../home_screen.dart';
+import '../../../../services/user_firestore_service.dart'; // formatSaldoIdr
 
 class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
-  const IsiSaldoLewatBankBriPage2({super.key});
+  final double amount;
+  final String transactionCode;
+  final String redirectUrl;
+  final double total;
+
+  const IsiSaldoLewatBankBriPage2({
+    super.key,
+    required this.amount,
+    required this.transactionCode,
+    required this.redirectUrl,
+    required this.total,
+  });
+
+  Future<void> _launchMidtrans() async {
+    final Uri url = Uri.parse(redirectUrl);
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +35,7 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Bank BRI',
+          'Detail Pembayaran',
           style: TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
@@ -26,6 +46,7 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
       ),
       body: Container(
         width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF4CAF50), Color(0xFF2196F3)],
@@ -61,10 +82,10 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     const Text(
-                      "Bank BRI",
+                      "Midtrans Payment Gateway",
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -73,22 +94,10 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // --- Tab Menu ---
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _tabButton("Mobile Banking", false, () {
-                    Navigator.pop(context); // kembali ke tab 1
-                  }),
-                  _tabButton("ATM", true, () {}),
-                ],
-              ),
-              const SizedBox(height: 16),
-
               // --- Kartu Detail Isi Saldo ---
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -103,91 +112,75 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Image.asset('assets/image/icon_bri.png', width: 40),
-                        const SizedBox(width: 10),
-                        const Text(
-                          "Bank BRI",
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "Nomor Virtual Account",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        color: Colors.black54,
+                    const Center(
+                      child: Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.green,
+                        size: 52,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "77778081234567890",
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
+                    const SizedBox(height: 10),
+                    const Center(
+                      child: Text(
+                        "Transaksi Berhasil Dibuat",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
-                        OutlinedButton(
-                          onPressed: () {
-                            // TODO: fungsi salin ke clipboard
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Nomor Virtual Account disalin"),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.blueAccent),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            "Salin",
-                            style: TextStyle(
-                              color: Colors.blueAccent,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                     const Divider(height: 24, thickness: 1),
+
+                    _buildDetailRow("Kode Order", transactionCode),
+                    _buildDetailRow("Nominal Isi Saldo", formatSaldoIdr(amount.toInt())),
+                    _buildDetailRow("Biaya Admin", "Rp 0"),
+                    const Divider(height: 20),
+                    _buildDetailRow("Total Bayar", formatSaldoIdr(total.toInt()), bold: true),
+
+                    const Divider(height: 24, thickness: 1),
                     const Text(
-                      "Cara Isi Saldo EZ Pay :",
+                      "Status Pembayaran :",
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
-                        fontSize: 15,
+                        fontSize: 14,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     const Text(
-                      "1. Masukkan kartu ATM dan PIN BRI anda\n"
-                      "2. Pilih Menu Pembayaran\n"
-                      "3. Pilih Menu Lainnya > Menu Briva\n"
-                      "4. Masukkan Kode 77778081234567890\n"
-                      "5. Konfirmasi Transaksi Anda\n"
-                      "6. Masukkan Nominal Isi Saldo Minimum Rp.10.000,-\n"
-                      "7. Ikuti Instruksi untuk menyelesaikan Transaksi\n"
-                      "8. Biaya Isi saldo Rp.1.500,-",
+                      "Halaman pembayaran Midtrans telah dibuka di browser eksternal handphone Anda. Silakan selesaikan pembayaran di sana.\n\nJika halaman tertutup, Anda dapat menekan tombol di bawah untuk membuka kembali gerbang pembayaran.",
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 14,
-                        height: 1.6,
-                        color: Colors.black87,
+                        fontSize: 13,
+                        height: 1.5,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tombol Buka Ulang Midtrans
+                    SizedBox(
+                      width: double.infinity,
+                      height: 40,
+                      child: OutlinedButton.icon(
+                        onPressed: _launchMidtrans,
+                        icon: const Icon(Icons.open_in_new, size: 18),
+                        label: const Text(
+                          "Buka Ulang Halaman Pembayaran",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.blueAccent),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -195,15 +188,15 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // --- Tombol Kembali ke Beranda ---
+              // --- Tombol Selesai (Kembali ke Beranda) ---
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
+                    Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      (route) => false,
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -213,11 +206,11 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    "KEMBALI KE BERANDA",
+                    "SELESAI (KEMBALI KE BERANDA)",
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: 14,
                       color: Colors.white,
                     ),
                   ),
@@ -230,31 +223,30 @@ class IsiSaldoLewatBankBriPage2 extends StatelessWidget {
     );
   }
 
-  // --- Tab Button Reusable ---
-  Widget _tabButton(String text, bool isActive, VoidCallback onTap) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 36,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.blue.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isActive ? Colors.green : Colors.transparent,
-              width: 2,
-            ),
-          ),
-          child: Text(
-            text,
+  Widget _buildDetailRow(String label, String value, {bool bold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
             style: TextStyle(
               fontFamily: 'Poppins',
-              color: isActive ? Colors.black : Colors.black54,
-              fontWeight: FontWeight.w500,
+              fontSize: 13,
+              color: Colors.grey.shade700,
             ),
           ),
-        ),
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
+              fontSize: 13,
+              color: Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'top_up_e_wallet_shoppepay_page2.dart';
 
 class TopUpEwalletShoppePayPage1 extends StatelessWidget {
   const TopUpEwalletShoppePayPage1({super.key});
@@ -36,11 +37,12 @@ class TopUpEwalletShoppePayPage1 extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Shoppee Pay',
+                      'ShopeePay',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -80,17 +82,18 @@ class TopUpEwalletShoppePayPage1 extends StatelessWidget {
                         child: Row(
                           children: [
                             Image.asset(
-                              'assets/image/icon_shopeepay.png', // pastikan file ini ada
+                              'assets/image/icon_shopeepay.png',
                               width: 40,
                               height: 40,
                             ),
                             const SizedBox(width: 12),
                             const Text(
-                              'Shoppee Pay',
+                              'ShopeePay',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
+                                fontFamily: 'Poppins',
                               ),
                             ),
                           ],
@@ -105,6 +108,7 @@ class TopUpEwalletShoppePayPage1 extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -112,7 +116,7 @@ class TopUpEwalletShoppePayPage1 extends StatelessWidget {
                       // Input Nomor
                       TextField(
                         controller: nomorController,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                           hintText: '081020304050',
                           filled: true,
@@ -142,9 +146,19 @@ class TopUpEwalletShoppePayPage1 extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            // Navigasi ke halaman selanjutnya nanti
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Nomor E-Wallet: ${nomorController.text}')),
+                            if (nomorController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Masukkan nomor handphone penerima')),
+                              );
+                              return;
+                            }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TopUpEwalletShoppePayPage2(
+                                  nomorEwallet: nomorController.text,
+                                ),
+                              ),
                             );
                           },
                           child: const Text(
@@ -153,6 +167,7 @@ class TopUpEwalletShoppePayPage1 extends StatelessWidget {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
+                              fontFamily: 'Poppins',
                             ),
                           ),
                         ),

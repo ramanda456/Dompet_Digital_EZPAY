@@ -1,35 +1,41 @@
 import 'package:flutter/material.dart';
+import '../../../../services/user_firestore_service.dart'; // formatSaldoIdr
 
 class TopUpEwalletShoppePayPage7 extends StatelessWidget {
-  const TopUpEwalletShoppePayPage7({super.key});
+  final String penerimaNama;
+  final String penerimaNomor;
+  final double amount;
+  final double adminFee;
+  final String transactionCode;
+  final String date;
+
+  const TopUpEwalletShoppePayPage7({
+    super.key,
+    required this.penerimaNama,
+    required this.penerimaNomor,
+    required this.amount,
+    required this.adminFee,
+    required this.transactionCode,
+    required this.date,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final double total = amount + adminFee;
+
     return Scaffold(
       backgroundColor: const Color(0xFF4CAF50),
       body: SafeArea(
         child: Column(
           children: [
-            // Tombol Back dan Logo
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const Spacer(),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
+            // Spacer atas
+            const SizedBox(height: 30),
 
             // Logo EZPay dan Status
             Column(
               children: [
                 Image.asset(
-                  'assets/image/logo_ezpay.png', // pastikan file logo ada
+                  'assets/image/logo_ezpay.png',
                   width: 80,
                   height: 60,
                 ),
@@ -40,8 +46,10 @@ class TopUpEwalletShoppePayPage7 extends StatelessWidget {
                     color: Color(0xFF3F51B5),
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
                   ),
                 ),
+                const SizedBox(height: 4),
                 const Icon(Icons.check_circle, color: Colors.green, size: 24),
               ],
             ),
@@ -82,6 +90,7 @@ class TopUpEwalletShoppePayPage7 extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ),
@@ -92,6 +101,7 @@ class TopUpEwalletShoppePayPage7 extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 15,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ),
@@ -101,28 +111,30 @@ class TopUpEwalletShoppePayPage7 extends StatelessWidget {
                       Row(
                         children: [
                           Image.asset(
-                            'assets/image/icon_shopeepay.png', // logo ShopeePay
+                            'assets/image/icon_shopeepay.png',
                             width: 40,
                             height: 40,
                           ),
                           const SizedBox(width: 10),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Ronaldo',
-                                  style: TextStyle(
+                                  penerimaNama,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
+                                    fontFamily: 'Poppins',
                                   ),
                                 ),
                                 Text(
-                                  'Shoppe pay | 081020304050',
-                                  style: TextStyle(
+                                  'ShopeePay | $penerimaNomor',
+                                  style: const TextStyle(
                                     color: Colors.white70,
                                     fontSize: 13,
+                                    fontFamily: 'Poppins',
                                   ),
                                 ),
                               ],
@@ -141,44 +153,44 @@ class TopUpEwalletShoppePayPage7 extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       // Detail transaksi
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'ID Transaksi',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                            style: TextStyle(color: Colors.white70, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                           Text(
-                            'TP21021904573',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            transactionCode,
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                        children: const [
                           Text(
                             'Referensi',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                            style: TextStyle(color: Colors.white70, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                           Text(
                             '-',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'Tanggal',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                            style: TextStyle(color: Colors.white70, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                           Text(
-                            '08 Oktober 2025 11.30',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            date.length >= 16 ? date.substring(0, 16) : date,
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                         ],
                       ),
@@ -191,51 +203,53 @@ class TopUpEwalletShoppePayPage7 extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'Nominal Top Up',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                           Text(
-                            'Rp 100.000',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            formatSaldoIdr(amount.toInt()),
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'Biaya Admin',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                           Text(
-                            'Rp 1.000',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            formatSaldoIdr(adminFee.toInt()),
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'Total',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins',
                             ),
                           ),
                           Text(
-                            'Rp 101.000',
-                            style: TextStyle(
+                            formatSaldoIdr(total.toInt()),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins',
                             ),
                           ),
                         ],
@@ -270,6 +284,7 @@ class TopUpEwalletShoppePayPage7 extends StatelessWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ),

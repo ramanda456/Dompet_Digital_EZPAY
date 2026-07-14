@@ -1,7 +1,21 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../../../services/api_service.dart';
+import 'top_up_e_wallet_shoppepay_page7.dart';
 
 class TopUpEwalletShoppePayPage6 extends StatefulWidget {
-  const TopUpEwalletShoppePayPage6({super.key});
+  final String penerimaNama;
+  final String penerimaNomor;
+  final double amount;
+  final double adminFee;
+
+  const TopUpEwalletShoppePayPage6({
+    super.key,
+    required this.penerimaNama,
+    required this.penerimaNomor,
+    required this.amount,
+    required this.adminFee,
+  });
 
   @override
   State<TopUpEwalletShoppePayPage6> createState() =>
@@ -10,11 +24,12 @@ class TopUpEwalletShoppePayPage6 extends StatefulWidget {
 
 class _TopUpEwalletShoppePayPage6State
     extends State<TopUpEwalletShoppePayPage6> {
-  final List<String> pin = ["", "", "", ""];
+  final List<String> pin = ["", "", "", "", "", ""];
   int currentIndex = 0;
+  bool _isLoading = false;
 
   void _addDigit(String value) {
-    if (currentIndex < 4) {
+    if (currentIndex < 6) {
       setState(() {
         pin[currentIndex] = value;
         currentIndex++;
@@ -31,28 +46,91 @@ class _TopUpEwalletShoppePayPage6State
     }
   }
 
-  void _confirmPin() {
+  Future<void> _confirmPin() async {
     if (pin.contains("")) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Harap masukkan PIN lengkap")),
       );
-    } else {
-      String pinValue = pin.join();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("PIN Dikonfirmasi: $pinValue")),
+      return;
+    }
+
+    final pinValue = pin.join();
+    setState(() => _isLoading = true);
+
+    try {
+      final res = await ApiService.instance.transferEwallet(
+        ewalletName: 'ShopeePay',
+        accountNumber: widget.penerimaNomor,
+        accountHolderName: widget.penerimaNama,
+        amount: widget.amount,
+        pin: pinValue,
       );
+
+      if (kDebugMode) debugPrint('E-wallet transfer response: $res');
+
+      if (!mounted) return;
+
+      if (res['success'] == true) {
+        final txData = res['data'];
+        final transactionCode = txData?['transaction_code'] ?? '-';
+        final date = txData?['created_at'] ?? '-';
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TopUpEwalletShoppePayPage7(
+              penerimaNama: widget.penerimaNama,
+              penerimaNomor: widget.penerimaNomor,
+              amount: widget.amount,
+              adminFee: widget.adminFee,
+              transactionCode: transactionCode,
+              date: date,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['message'] ?? 'Transfer gagal'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        setState(() {
+          for (int i = 0; i < 6; i++) {
+            pin[i] = "";
+          }
+          currentIndex = 0;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Terjadi kesalahan: $e'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Widget _buildPinBox(String value) {
     return Container(
-      width: 50,
-      height: 50,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      width: 42,
+      height: 52,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black54, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       alignment: Alignment.center,
       child: Text(
@@ -71,9 +149,16 @@ class _TopUpEwalletShoppePayPage6State
       onTap: () => _addDigit(number),
       child: Container(
         alignment: Alignment.center,
+        width: 72,
+        height: 52,
         child: Text(
           number,
-          style: const TextStyle(fontSize: 24, color: Colors.black87),
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+            fontFamily: 'Poppins',
+          ),
         ),
       ),
     );
@@ -82,7 +167,7 @@ class _TopUpEwalletShoppePayPage6State
   Widget _buildKeyboard() {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: [
           for (var row in [
@@ -92,16 +177,20 @@ class _TopUpEwalletShoppePayPage6State
             ["", "0", "⌫"]
           ])
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: row.map((value) {
                   if (value == "") {
-                    return const SizedBox(width: 60);
+                    return const SizedBox(width: 72);
                   } else if (value == "⌫") {
                     return GestureDetector(
                       onTap: _removeDigit,
-                      child: const Icon(Icons.backspace_outlined, size: 26),
+                      child: const SizedBox(
+                        width: 72,
+                        height: 52,
+                        child: Icon(Icons.backspace_outlined, size: 26),
+                      ),
                     );
                   } else {
                     return _buildNumberButton(value);
@@ -151,6 +240,7 @@ class _TopUpEwalletShoppePayPage6State
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -171,21 +261,31 @@ class _TopUpEwalletShoppePayPage6State
                 width: 220,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _confirmPin,
+                  onPressed: _isLoading ? null : _confirmPin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3F51B5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  child: const Text(
-                    "Konfirmasi",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "Konfirmasi",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
                 ),
               ),
 

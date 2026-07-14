@@ -1,8 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../../../services/api_service.dart';
 import '../../tarik_tunai_lewat_merchant/tarik_tunai_lewat_merchant_indomaret/tarik_tunai_lewat_merchant_indomaret_page4.dart';
 
 class TarikTunaiLewatMerchantIndomaretPage3 extends StatefulWidget {
-  const TarikTunaiLewatMerchantIndomaretPage3({super.key});
+  final double amount;
+
+  const TarikTunaiLewatMerchantIndomaretPage3({
+    super.key,
+    required this.amount,
+  });
 
   @override
   State<TarikTunaiLewatMerchantIndomaretPage3> createState() =>
@@ -12,6 +19,7 @@ class TarikTunaiLewatMerchantIndomaretPage3 extends StatefulWidget {
 class _TarikTunaiLewatMerchantIndomaretPage3State
     extends State<TarikTunaiLewatMerchantIndomaretPage3> {
   String enteredPin = '';
+  bool _isLoading = false;
 
   void _addDigit(String digit) {
     if (enteredPin.length < 6) {
@@ -29,19 +37,69 @@ class _TarikTunaiLewatMerchantIndomaretPage3State
     }
   }
 
-  void _confirmPin() {
-    if (enteredPin.length == 6) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TarikTunaiLewatMerchantIndomaretPage4(),
-        ),
-      );
-
-    } else {
+  Future<void> _confirmPin() async {
+    if (enteredPin.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Masukkan 6 digit PIN terlebih dahulu")),
       );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final res = await ApiService.instance.tarikTunai(
+        amount: widget.amount,
+        pin: enteredPin,
+        merchantCode: 'IND001',
+      );
+
+      if (kDebugMode) debugPrint('Tarik tunai response: $res');
+
+      if (!mounted) return;
+
+      if (res['success'] == true) {
+        final txData = res['data'];
+        final detail = txData?['detail'];
+        final withdrawalCode = detail?['withdrawal_code'] as String? ?? '-';
+        final transactionCode = txData?['transaction_code'] as String? ?? '-';
+        final double adminFee = (txData?['admin_fee'] is num)
+            ? (txData['admin_fee'] as num).toDouble()
+            : 0.0;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TarikTunaiLewatMerchantIndomaretPage4(
+              amount: widget.amount,
+              withdrawalCode: withdrawalCode,
+              transactionCode: transactionCode,
+              adminFee: adminFee,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['message'] ?? 'Tarik tunai gagal'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        setState(() {
+          enteredPin = '';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Terjadi kesalahan: $e'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -74,6 +132,7 @@ class _TarikTunaiLewatMerchantIndomaretPage3State
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -94,6 +153,13 @@ class _TarikTunaiLewatMerchantIndomaretPage3State
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(
@@ -122,15 +188,25 @@ class _TarikTunaiLewatMerchantIndomaretPage3State
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  onPressed: _confirmPin,
-                  child: const Text(
-                    "Konfirmasi",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
+                  onPressed: _isLoading ? null : _confirmPin,
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "Konfirmasi",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
                 ),
               ),
 
@@ -201,6 +277,7 @@ class _TarikTunaiLewatMerchantIndomaretPage3State
                   fontSize: 24,
                   color: Colors.black87,
                   fontWeight: FontWeight.w500,
+                  fontFamily: 'Poppins',
                 ),
               ),
       ),

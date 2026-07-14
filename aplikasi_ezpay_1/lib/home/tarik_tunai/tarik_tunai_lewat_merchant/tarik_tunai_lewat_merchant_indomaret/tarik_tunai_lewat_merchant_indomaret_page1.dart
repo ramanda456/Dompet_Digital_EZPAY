@@ -14,6 +14,12 @@ class _TarikTunaiLewatMerchantIndomaretPage1State
   final TextEditingController _nominalController = TextEditingController();
 
   @override
+  void dispose() {
+    _nominalController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -44,6 +50,7 @@ class _TarikTunaiLewatMerchantIndomaretPage1State
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                     ],
@@ -67,6 +74,7 @@ class _TarikTunaiLewatMerchantIndomaretPage1State
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ],
@@ -98,14 +106,20 @@ class _TarikTunaiLewatMerchantIndomaretPage1State
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                         const SizedBox(height: 10),
                         TextField(
                           controller: _nominalController,
                           keyboardType: TextInputType.number,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                          ),
                           decoration: InputDecoration(
                             hintText: "Rp 0",
+                            prefixText: "Rp ",
                             filled: true,
                             fillColor: const Color(0xFFF0F0F0),
                             contentPadding: const EdgeInsets.symmetric(
@@ -132,6 +146,7 @@ class _TarikTunaiLewatMerchantIndomaretPage1State
                               color: Colors.black87,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
+                              fontFamily: 'Poppins',
                             ),
                           ),
                         ),
@@ -152,10 +167,29 @@ class _TarikTunaiLewatMerchantIndomaretPage1State
                         ),
                       ),
                       onPressed: () {
+                        final cleanAmountStr = _nominalController.text
+                            .replaceAll('Rp', '')
+                            .replaceAll('.', '')
+                            .trim();
+
+                        final double? amount = double.tryParse(cleanAmountStr);
+
+                        if (amount == null || amount < 50000) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Minimal Tarik Tunai adalah Rp 50.000'),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                          return;
+                        }
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TarikTunaiLewatMerchantIndomaretPage2(),
+                            builder: (context) => TarikTunaiLewatMerchantIndomaretPage2(
+                              amount: amount,
+                            ),
                           ),
                         );
                       },
@@ -165,6 +199,7 @@ class _TarikTunaiLewatMerchantIndomaretPage1State
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.2,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                     ),

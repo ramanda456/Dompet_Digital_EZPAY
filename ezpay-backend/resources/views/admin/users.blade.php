@@ -88,36 +88,6 @@
                             </div>
                         </td>
                     </tr>
-
-                    <!-- Top Up Modal for each user -->
-                    <div class="modal fade" id="topupModal-{{ $user->id }}" tabindex="-1" aria-labelledby="topupModalLabel-{{ $user->id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-0 rounded-4 shadow-lg">
-                                <div class="modal-header border-0 bg-light rounded-top-4 py-3">
-                                    <h5 class="modal-title outfit fw-bold" id="topupModalLabel-{{ $user->id }}">Isi Saldo Pengguna</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <form action="{{ route('admin.users.add-balance', $user->id) }}" method="POST">
-                                    @csrf
-                                    <div class="modal-body p-4">
-                                        <p class="text-muted">Masukkan nominal saldo yang ingin ditambahkan ke akun <strong>{{ $user->name }}</strong>.</p>
-                                        <div class="mb-3">
-                                            <label class="form-label text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Nominal (Rupiah)</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0 fw-bold">Rp</span>
-                                                <input type="number" name="amount" class="form-control border-start-0 outfit fw-bold" placeholder="50000" min="1000" required>
-                                            </div>
-                                            <small class="text-muted mt-1 d-block">Minimal pengisian manual Rp 1.000</small>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer border-0 p-3">
-                                        <button type="button" class="btn btn-light rounded-3 fw-bold" data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn btn-gradient rounded-3 px-4">Proses Top Up</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                 @empty
                     <tr>
                         <td colspan="7" class="text-center py-4 text-muted">Pengguna tidak ditemukan.</td>
@@ -132,4 +102,36 @@
         {{ $users->appends(['search' => $search])->links('pagination::bootstrap-5') }}
     </div>
 </div>
+
+<!-- Modals rendered outside of custom-card (to bypass backdrop-filter stacking context) -->
+@foreach($users as $user)
+    <div class="modal fade" id="topupModal-{{ $user->id }}" tabindex="-1" aria-labelledby="topupModalLabel-{{ $user->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-header border-0 bg-light rounded-top-4 py-3">
+                    <h5 class="modal-title outfit fw-bold" id="topupModalLabel-{{ $user->id }}">Isi Saldo Pengguna</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('admin.users.add-balance', $user->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <p class="text-muted">Masukkan nominal saldo yang ingin ditambahkan ke akun <strong>{{ $user->name }}</strong>.</p>
+                        <div class="mb-3">
+                            <label class="form-label text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Nominal (Rupiah)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 fw-bold">Rp</span>
+                                <input type="number" name="amount" class="form-control border-start-0 outfit fw-bold" placeholder="50000" min="1000" required>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Minimal pengisian manual Rp 1.000</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-3">
+                        <button type="button" class="btn btn-light rounded-3 fw-bold" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-gradient rounded-3 px-4">Proses Top Up</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endforeach
 @endsection

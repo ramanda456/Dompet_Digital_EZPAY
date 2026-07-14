@@ -39,9 +39,7 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi> {
         // Ambil saldo
         final saldoRes = await ApiService.instance.getSaldo();
         if (saldoRes['success'] == true && saldoRes['data'] != null) {
-          _balance = (saldoRes['data']['balance'] is num)
-              ? (saldoRes['data']['balance'] as num).toInt()
-              : int.tryParse('${saldoRes['data']['balance']}') ?? 0;
+          _balance = double.tryParse('${saldoRes['data']['balance']}')?.toInt() ?? 0;
         }
 
         // Ambil riwayat transaksi

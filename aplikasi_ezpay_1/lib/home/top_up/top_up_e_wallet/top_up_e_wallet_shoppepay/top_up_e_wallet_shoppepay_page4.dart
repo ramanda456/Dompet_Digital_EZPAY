@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
+import 'top_up_e_wallet_shoppepay_page5.dart';
 
 class TopUpEwalletShoppePayPage4 extends StatefulWidget {
-  const TopUpEwalletShoppePayPage4({super.key});
+  final String penerimaNama;
+  final String penerimaNomor;
+  final String saldoUserNama;
+  final String saldoUserNomor;
+  final int saldoUserJumlahVal;
+
+  const TopUpEwalletShoppePayPage4({
+    super.key,
+    required this.penerimaNama,
+    required this.penerimaNomor,
+    required this.saldoUserNama,
+    required this.saldoUserNomor,
+    required this.saldoUserJumlahVal,
+  });
 
   @override
   State<TopUpEwalletShoppePayPage4> createState() =>
@@ -27,6 +41,12 @@ class _TopUpEwalletShoppePayPage4State
     '500.000',
     '1.000.000',
   ];
+
+  @override
+  void dispose() {
+    nominalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +81,12 @@ class _TopUpEwalletShoppePayPage4State
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Shoppee Pay',
+                      'ShopeePay',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -107,17 +128,18 @@ class _TopUpEwalletShoppePayPage4State
                         child: Row(
                           children: [
                             Image.asset(
-                              'assets/image/icon_shopeepay.png', // pastikan file ini ada
+                              'assets/image/icon_shopeepay.png',
                               width: 40,
                               height: 40,
                             ),
                             const SizedBox(width: 12),
                             const Text(
-                              'Shoppee Pay',
+                              'ShopeePay',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
+                                fontFamily: 'Poppins',
                               ),
                             ),
                           ],
@@ -132,6 +154,7 @@ class _TopUpEwalletShoppePayPage4State
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -139,8 +162,13 @@ class _TopUpEwalletShoppePayPage4State
                       TextField(
                         controller: nominalController,
                         keyboardType: TextInputType.number,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                        ),
                         decoration: InputDecoration(
                           hintText: 'Rp 0',
+                          prefixText: 'Rp ',
                           filled: true,
                           fillColor: const Color(0xFFF5F5F5),
                           contentPadding: const EdgeInsets.symmetric(
@@ -156,6 +184,13 @@ class _TopUpEwalletShoppePayPage4State
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
+                        onChanged: (val) {
+                          if (selectedNominal != val) {
+                            setState(() {
+                              selectedNominal = null;
+                            });
+                          }
+                        },
                       ),
                       const SizedBox(height: 10),
 
@@ -173,6 +208,7 @@ class _TopUpEwalletShoppePayPage4State
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.black87,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ),
@@ -193,6 +229,7 @@ class _TopUpEwalletShoppePayPage4State
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ),
@@ -223,7 +260,7 @@ class _TopUpEwalletShoppePayPage4State
                                 onTap: () {
                                   setState(() {
                                     selectedNominal = nominal;
-                                    nominalController.text = 'Rp $nominal';
+                                    nominalController.text = nominal;
                                   });
                                 },
                                 child: Container(
@@ -247,6 +284,7 @@ class _TopUpEwalletShoppePayPage4State
                                       color: isSelected
                                           ? Colors.white
                                           : Colors.black,
+                                      fontFamily: 'Poppins',
                                     ),
                                   ),
                                 ),
@@ -270,19 +308,35 @@ class _TopUpEwalletShoppePayPage4State
                             ),
                           ),
                           onPressed: () {
-                            if (nominalController.text.isEmpty) {
+                            final cleanAmountStr = nominalController.text
+                                .replaceAll('Rp', '')
+                                .replaceAll('.', '')
+                                .trim();
+                            
+                            final double? amount = double.tryParse(cleanAmountStr);
+
+                            if (amount == null || amount < 20000) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                      'Silakan pilih atau masukkan nominal terlebih dahulu!'),
+                                      'Silakan pilih atau masukkan nominal minimal Rp 20.000!'),
                                 ),
                               );
                               return;
                             }
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(
-                                      'Nominal dikonfirmasi: ${nominalController.text}')),
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TopUpEwalletShoppePayPage5(
+                                  penerimaNama: widget.penerimaNama,
+                                  penerimaNomor: widget.penerimaNomor,
+                                  saldoUserNama: widget.saldoUserNama,
+                                  saldoUserNomor: widget.saldoUserNomor,
+                                  saldoUserJumlahVal: widget.saldoUserJumlahVal,
+                                  amount: amount,
+                                ),
+                              ),
                             );
                           },
                           child: const Text(
@@ -291,6 +345,7 @@ class _TopUpEwalletShoppePayPage4State
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
+                              fontFamily: 'Poppins',
                             ),
                           ),
                         ),

@@ -62,9 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (profileRes['success'] == true) {
           final data = profileRes['data'];
           _displayName = data['name'] ?? user?.displayName ?? 'Pengguna';
-          _balance = (data['balance'] is num)
-              ? (data['balance'] as num).toInt()
-              : int.tryParse('${data['balance']}') ?? 0;
+          _balance = double.tryParse('${data['balance']}')?.toInt() ?? 0;
         } else {
           // Fallback ke Firebase Auth
           _displayName = user?.displayName ?? user?.email?.split('@').first ?? 'Pengguna';

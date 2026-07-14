@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
+import '../../../../services/user_firestore_service.dart'; // formatSaldoIdr
+import 'top_up_e_wallet_shoppepay_page6.dart';
 
 class TopUpEwalletShoppePayPage5 extends StatelessWidget {
-  final String saldo = "Rp. 1.275.500,-";
-  final String ewallet = "Shoppe pay";
-  final String nomorHp = "081020304050";
-  final String nama = "RONALDO";
-  final String jumlahTopUp = "Rp 100.000";
-  final String biayaAdmin = "Rp 1.000";
-  final String total = "Rp 101.000";
+  final String penerimaNama;
+  final String penerimaNomor;
+  final String saldoUserNama;
+  final String saldoUserNomor;
+  final int saldoUserJumlahVal;
+  final double amount;
 
-  const TopUpEwalletShoppePayPage5({super.key});
+  const TopUpEwalletShoppePayPage5({
+    super.key,
+    required this.penerimaNama,
+    required this.penerimaNomor,
+    required this.saldoUserNama,
+    required this.saldoUserNomor,
+    required this.saldoUserJumlahVal,
+    required this.amount,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final double adminFee = 1000;
+    final double total = amount + adminFee;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
@@ -45,15 +57,17 @@ class TopUpEwalletShoppePayPage5 extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: Colors.black87,
+                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  saldo,
+                  formatSaldoIdr(saldoUserJumlahVal),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
+                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -61,24 +75,22 @@ class TopUpEwalletShoppePayPage5 extends StatelessWidget {
                   color: Colors.black,
                   thickness: 1,
                   height: 20,
-                  indent: 0,
-                  endIndent: 0,
                 ),
 
                 const SizedBox(height: 16),
 
                 // Detail transaksi
-                _buildDetailRow("E-wallet", ewallet),
+                _buildDetailRow("E-wallet", "ShopeePay"),
                 const SizedBox(height: 6),
-                _buildDetailRow("No.Handphone", nomorHp, boldValue: true),
+                _buildDetailRow("No. Handphone", penerimaNomor, boldValue: true),
                 const SizedBox(height: 6),
-                _buildDetailRow("Nama", nama, boldValue: true),
+                _buildDetailRow("Nama", penerimaNama, boldValue: true),
                 const SizedBox(height: 6),
-                _buildDetailRow("Jumlah Top Up", jumlahTopUp, boldValue: true),
+                _buildDetailRow("Jumlah Top Up", formatSaldoIdr(amount.toInt()), boldValue: true),
                 const SizedBox(height: 6),
-                _buildDetailRow("Biaya Admin", biayaAdmin, boldValue: true),
+                _buildDetailRow("Biaya Admin", formatSaldoIdr(adminFee.toInt()), boldValue: true),
                 const SizedBox(height: 10),
-                _buildDetailRow("Total", total, boldLabel: true, boldValue: true),
+                _buildDetailRow("Total", formatSaldoIdr(total.toInt()), boldLabel: true, boldValue: true),
 
                 const SizedBox(height: 30),
 
@@ -94,8 +106,16 @@ class TopUpEwalletShoppePayPage5 extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Transaksi dikonfirmasi')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TopUpEwalletShoppePayPage6(
+                            penerimaNama: penerimaNama,
+                            penerimaNomor: penerimaNomor,
+                            amount: amount,
+                            adminFee: adminFee,
+                          ),
+                        ),
                       );
                     },
                     child: const Text(
@@ -104,6 +124,7 @@ class TopUpEwalletShoppePayPage5 extends StatelessWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ),
@@ -127,6 +148,7 @@ class TopUpEwalletShoppePayPage5 extends StatelessWidget {
             fontSize: 14,
             fontWeight: boldLabel ? FontWeight.bold : FontWeight.normal,
             color: Colors.black87,
+            fontFamily: 'Poppins',
           ),
         ),
         Text(
@@ -135,6 +157,7 @@ class TopUpEwalletShoppePayPage5 extends StatelessWidget {
             fontSize: 14,
             fontWeight: boldValue ? FontWeight.bold : FontWeight.normal,
             color: Colors.black87,
+            fontFamily: 'Poppins',
           ),
         ),
       ],

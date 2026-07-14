@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'top_up_e_wallet_shoppepay_page3.dart';
 
 class TopUpEwalletShoppePayPage2 extends StatelessWidget {
   final String nomorEwallet;
@@ -39,11 +40,12 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Shoppee Pay',
+                      'ShopeePay',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -84,17 +86,18 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                         child: Row(
                           children: [
                             Image.asset(
-                              'assets/image/icon_shopeepay.png', // pastikan file ini ada
+                              'assets/image/icon_shopeepay.png',
                               width: 40,
                               height: 40,
                             ),
                             const SizedBox(width: 12),
                             const Text(
-                              'Shoppee Pay',
+                              'ShopeePay',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
+                                fontFamily: 'Poppins',
                               ),
                             ),
                           ],
@@ -110,6 +113,7 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -129,6 +133,7 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                             color: Colors.black87,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ),
@@ -142,6 +147,7 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -181,13 +187,15 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
+                                    fontFamily: 'Poppins',
                                   ),
                                 ),
                                 Text(
-                                  'shoppe pay - $nomorEwallet',
+                                  'ShopeePay - $nomorEwallet',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     color: Colors.black87,
+                                    fontFamily: 'Poppins',
                                   ),
                                 ),
                               ],
@@ -210,9 +218,14 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            // Navigasi ke halaman selanjutnya (misal nominal)
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Penerima dikonfirmasi')),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TopUpEwalletShoppePayPage3(
+                                  penerimaNama: 'Ronaldo',
+                                  penerimaNomor: nomorEwallet,
+                                ),
+                              ),
                             );
                           },
                           child: const Text(
@@ -221,6 +234,7 @@ class TopUpEwalletShoppePayPage2 extends StatelessWidget {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
+                              fontFamily: 'Poppins',
                             ),
                           ),
                         ),

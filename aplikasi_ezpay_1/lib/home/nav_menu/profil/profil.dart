@@ -58,9 +58,7 @@ class _ProfilPageState extends State<ProfilPage> {
           final data = res['data'];
           _displayName = data['name'] ?? user?.displayName ?? 'Pengguna';
           _phone = data['phone'] ?? 'Belum diatur';
-          _balance = (data['balance'] is num)
-              ? (data['balance'] as num).toInt()
-              : int.tryParse('${data['balance']}') ?? 0;
+          _balance = double.tryParse('${data['balance']}')?.toInt() ?? 0;
         } else {
           _displayName = user?.displayName ?? user?.email?.split('@').first ?? 'Pengguna';
         }

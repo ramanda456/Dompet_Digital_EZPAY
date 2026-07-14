@@ -1,8 +1,53 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../../../services/api_service.dart';
+import '../../../../services/user_firestore_service.dart'; // formatSaldoIdr
 import '../../tarik_tunai_lewat_merchant/tarik_tunai_lewat_merchant_indomaret/tarik_tunai_lewat_merchant_indomaret_page3.dart';
 
-class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
-  const TarikTunaiLewatMerchantIndomaretPage2({super.key});
+class TarikTunaiLewatMerchantIndomaretPage2 extends StatefulWidget {
+  final double amount;
+
+  const TarikTunaiLewatMerchantIndomaretPage2({
+    super.key,
+    required this.amount,
+  });
+
+  @override
+  State<TarikTunaiLewatMerchantIndomaretPage2> createState() =>
+      _TarikTunaiLewatMerchantIndomaretPage2State();
+}
+
+class _TarikTunaiLewatMerchantIndomaretPage2State
+    extends State<TarikTunaiLewatMerchantIndomaretPage2> {
+  String _userName = "Pengguna";
+  String _userPhone = "-";
+  int _userBalance = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      if (ApiService.instance.isLoggedIn) {
+        final res = await ApiService.instance.getProfile();
+        if (res['success'] == true && res['data'] != null) {
+          setState(() {
+            _userName = res['data']['name'] ?? "Pengguna";
+            _userPhone = res['data']['phone'] ?? "-";
+            _userBalance = double.tryParse('${res['data']['balance']}')?.toInt() ?? 0;
+          });
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('Error loading profile Tarik Tunai: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +79,7 @@ class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -57,6 +103,7 @@ class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                     ],
@@ -88,21 +135,24 @@ class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF0F0F0),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Text(
-                          "Rp 100.000",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                        child: Text(
+                          formatSaldoIdr(widget.amount.toInt()),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black87,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ),
@@ -131,10 +181,11 @@ class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Saldo Anda",
+                        "Sumber Dana (EZPay)",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -161,33 +212,40 @@ class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  "Muhammad",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                Text(
-                                  "EZ Pay - 081234567890",
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  "Rp 1.275.500",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                            Expanded(
+                              child: _isLoading
+                                  ? const Center(child: CircularProgressIndicator())
+                                  : Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _userName,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 15,
+                                            fontFamily: 'Poppins',
+                                          ),
+                                        ),
+                                        Text(
+                                          "EZ Pay - $_userPhone",
+                                          style: const TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 13,
+                                            fontFamily: 'Poppins',
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          formatSaldoIdr(_userBalance),
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14,
+                                            fontFamily: 'Poppins',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
                           ],
                         ),
@@ -208,11 +266,22 @@ class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: _isLoading ? null : () {
+                      if (_userBalance < widget.amount) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Saldo Anda tidak mencukupi untuk melakukan penarikan'),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                        return;
+                      }
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TarikTunaiLewatMerchantIndomaretPage3(),
+                          builder: (context) => TarikTunaiLewatMerchantIndomaretPage3(
+                            amount: widget.amount,
+                          ),
                         ),
                       );
                     },
@@ -222,6 +291,7 @@ class TarikTunaiLewatMerchantIndomaretPage2 extends StatelessWidget {
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.2,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ),
